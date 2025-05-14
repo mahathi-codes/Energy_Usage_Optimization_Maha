@@ -1,0 +1,88 @@
+# Energy Usage Optimization System - Phase 3 Prototype Code
+
+# --- AI Model for Energy Pattern Analysis ---
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import random
+import time
+import hashlib
+
+# Simulate energy data
+np.random.seed(42)
+hours = np.arange(1, 25)
+energy_usage = np.random.normal(loc=500, scale=100, size=24)
+
+# Build DataFrame
+df = pd.DataFrame({'Hour': hours, 'EnergyUsage': energy_usage})
+
+# Train model
+X = df[['Hour']]
+y = df['EnergyUsage']
+model = LinearRegression()
+model.fit(X, y)
+
+# Predict next 24 hours
+future_hours = np.arange(25, 49).reshape(-1, 1)
+predicted_usage = model.predict(future_hours)
+
+# Display optimization tips
+def recommend(usage):
+    if usage > 600:
+        return "Consider turning off idle appliances."
+    elif usage > 500:
+        return "Shift appliance use to off-peak hours."
+    else:
+        return "Energy usage is efficient."
+
+df['Recommendation'] = df['EnergyUsage'].apply(recommend)
+print("AI Energy Recommendations:")
+print(df[['Hour', 'EnergyUsage', 'Recommendation']])
+
+# --- Simulated IoT Device Data ---
+print("\nSimulated IoT Data:")
+def get_iot_data():
+    return {
+        "appliance": "Air Conditioner",
+        "current_power": round(random.uniform(300, 1500), 2),  # Watts
+        "timestamp": time.strftime("%H:%M:%S")
+    }
+
+for _ in range(5):
+    print(get_iot_data())
+    time.sleep(1)
+
+# --- Blockchain Transaction Log ---
+class Block:
+    def __init__(self, index, data, previous_hash):
+        self.timestamp = time.time()
+        self.index = index
+        self.data = data
+        self.previous_hash = previous_hash
+        self.hash = self.compute_hash()
+
+    def compute_hash(self):
+        block_string = f"{self.index}{self.timestamp}{self.data}{self.previous_hash}"
+        return hashlib.sha256(block_string.encode()).hexdigest()
+
+class Blockchain:
+    def __init__(self):
+        self.chain = [self.create_genesis_block()]
+
+    def create_genesis_block(self):
+        return Block(0, "Genesis Block", "0")
+
+    def add_block(self, data):
+        last_block = self.chain[-1]
+        new_block = Block(len(self.chain), data, last_block.hash)
+        self.chain.append(new_block)
+
+# Example usage
+bc = Blockchain()
+bc.add_block("UserA consumed 1200W at 10 AM")
+bc.add_block("UserA sold 200W to UserB")
+
+print("\nBlockchain Log:")
+for block in bc.chain:
+    print(f"Block {block.index} | Hash: {block.hash[:10]}... | Data: {block.data}")
